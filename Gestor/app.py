@@ -28,7 +28,8 @@ def login():
         email = request.form['email']
         password = request.form['password']
         
-        usuario = gestor.verificar_usuario(email, password)
+        
+        usuario = gestor.obtener_usuario(email, password)
         
         if usuario:
             session['usuario_id'] = usuario['_id']

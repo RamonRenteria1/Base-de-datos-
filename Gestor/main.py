@@ -44,51 +44,33 @@ class GestorTareas:
             return None
     
     
-    def obtener_usuario(self, usuario_id: str) -> Optional[Dict]:
-        """Obtener usuario por ID"""
-        try:
-            usuario = self.usuarios.find_one({"_id": ObjectId(usuario_id)})
-            if usuario:
-                usuario['_id'] = str(usuario['_id'])
-            return usuario
-        except Exception as e:
-            print(f"Error al obtener usuario: {e}")
-            return None
-    
-    def crear_tarea(self, usuario_id: str, titulo: str, descripcion: str = "", 
-                fecha_limite: Optional[datetime] = None) -> Optional[str]:
-        """Crear una nueva tarea para un usuario"""
-        # Verificar que el usuario existe
-        if not self.obtener_usuario(usuario_id):
-            print(f"❌ Error: Usuario {usuario_id} no existe")
-            return None
-        
-        
-        
-        tarea = {
-            "usuario_id": ObjectId(usuario_id),
-            "titulo": titulo,
-            "descripcion": descripcion,
-            "estado": "pendiente",
-            "fecha_creacion": datetime.now(),
-            "fecha_limite": fecha_limite or datetime.now() + timedelta(days=7),
-            "completada": False,
-            "etiquetas": []
-        }
-        
-        resultado = self.tareas.insert_one(tarea)
-        return str(resultado.inserted_id)
-    def verificar_usuario(self, email: str, password: str) -> Optional[Dict]:
-        usuario = self.usuarios.find_one({
+    def obtener_usuario(self, email, password):
+        usuario = self.db.usuarios.find_one({
             "email": email, 
             "password": password
         })
-        
+
         if usuario:
-            usuario['_id'] = str(usuario['_id'])
+            usuario['_id'] = str(usuario['_id']) 
             return usuario
             
-        return None  
+        return None
+
+
+
+    
+    def crear_tarea(self, usuario_id, titulo, descripcion):
+        
+        
+        nueva_tarea = {
+            "usuario_id": usuario_id,
+            "titulo": titulo,
+            "descripcion": descripcion,
+            "estado": "pendiente"
+        }
+        
+        resultado = self.db.tareas.insert_one(nueva_tarea)
+        return str(resultado.inserted_id) 
     
     def obtener_tareas_usuario(self, usuario_id: str, estado: Optional[str] = None) -> List[Dict]:
         """Obtener tareas de un usuario, opcionalmente filtradas por estado"""
@@ -205,54 +187,3 @@ class GestorTareas:
             self.cliente.close()
             print("🔌 Conexión cerrada")
 
-# Ejemplo de uso
-def ejemplo_uso():
-    # Inicializar gestor
-    gestor = GestorTareas()
-    
-    # Crear usuario
-    usuario_id = gestor.crear_usuario("Ana García", "ana@email.com")
-    print(f"Usuario creado con ID: {usuario_id}")
-    
-    if usuario_id:
-        # Crear tareas
-        tarea1 = gestor.crear_tarea(
-            usuario_id, 
-            "Aprender MongoDB", 
-            "Completar tutorial de PyMongo",
-            datetime.now() + timedelta(days=3)
-        )
-        print(f"Tarea creada: {tarea1}")
-        
-        tarea2 = gestor.crear_tarea(
-            usuario_id,
-            "Hacer ejercicio",
-            "Ir al gimnasio 3 veces esta semana"
-        )
-        
-        # Agregar etiqueta
-        gestor.agregar_etiqueta(tarea1, "programación")
-        gestor.agregar_etiqueta(tarea1, "estudio")
-        
-        # Listar tareas
-        tareas = gestor.obtener_tareas_usuario(usuario_id)
-        print(f"\nTareas de {usuario_id}:")
-        for t in tareas:
-            print(f"  - {t['titulo']} [{t['estado']}]")
-        
-        # Actualizar estado
-        gestor.actualizar_estado_tarea(tarea1, "en_progreso")
-        
-        # Estadísticas
-        stats = gestor.estadisticas_usuario(usuario_id)
-        print(f"\nEstadísticas: {stats}")
-        
-        # Tareas urgentes
-        urgentes = gestor.tareas_urgentes(72)
-        print(f"\nTareas urgentes próximos 3 días: {len(urgentes)}")
-    
-    # Cerrar conexión
-    gestor.cerrar_conexion()
-
-if __name__ == "__main__":
-    ejemplo_uso()

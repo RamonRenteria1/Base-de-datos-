@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm mb-4 border-0 bg-white">
+            <div class="card-body">
+                <h5 class="card-title text-primary">Nueva Tarea</h5>
+                <form method="POST" action="{{ url_for('agregar_tarea') }}">
+                    <div class="mb-2">
+                        <input type="text" name="titulo" class="form-control" placeholder="¿Qué necesitas hacer?" required>
+                    </div>
+                    <div class="mb-3">
+                        <textarea name="descripcion" class="form-control" rows="2" placeholder="Detalles (opcional)"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Agregar</button>
+                </form>
+            </div>
+        </div>
+
+        <h4 class="text-secondary mb-3"> Pendientes</h4>
+        <div class="list-group shadow-sm">
+            {% for tarea in pendientes %}
+                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">{{ tarea.titulo }}</h6>
+                        {% if tarea.descripcion %}
+                            <small class="text-muted">{{ tarea.descripcion }}</small>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('completar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-success">
+                        ✔ Terminar
+                    </a>
+                </div>
+            {% else %}
+                <div class="list-group-item text-center text-muted py-4">
+                    ¡Genial! No tienes tareas pendientes.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <h4 class="text-success mb-3">Completadas</h4>
+        <div class="list-group shadow-sm opacity-75">
+            {% for tarea in completadas %}
+                <div class="list-group-item list-group-item-action bg-light">
+                    <h6 class="mb-1 text-decoration-line-through text-success">{{ tarea.titulo }}</h6>
+                    {% if tarea.descripcion %}
+                        <small class="text-muted">{{ tarea.descripcion }}</small>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="list-group-item text-center text-muted py-4 bg-light">
+                    Aún no has completado ninguna tarea.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -29,9 +29,12 @@
                             <small class="text-muted">{{ tarea.descripcion }}</small>
                         {% endif %}
                     </div>
-                    <a href="{{ url_for('completar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-success">
-                        ✔ Terminar
-                    </a>
+                    
+                    <div class="btn-group shadow-sm">
+                        <a href="{{ url_for('completar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-success" title="Completar">✔</a>
+                        <a href="{{ url_for('editar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-primary" title="Editar">✏️</a>
+                        <a href="{{ url_for('eliminar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Estás seguro de borrar esta tarea?');">🗑️</a>
+                    </div>
                 </div>
             {% else %}
                 <div class="list-group-item text-center text-muted py-4">
@@ -45,11 +48,15 @@
         <h4 class="text-success mb-3">Completadas</h4>
         <div class="list-group shadow-sm opacity-75">
             {% for tarea in completadas %}
-                <div class="list-group-item list-group-item-action bg-light">
-                    <h6 class="mb-1 text-decoration-line-through text-success">{{ tarea.titulo }}</h6>
-                    {% if tarea.descripcion %}
-                        <small class="text-muted">{{ tarea.descripcion }}</small>
-                    {% endif %}
+                <div class="list-group-item list-group-item-action bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-decoration-line-through text-success">{{ tarea.titulo }}</h6>
+                        {% if tarea.descripcion %}
+                            <small class="text-muted">{{ tarea.descripcion }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <a href="{{ url_for('eliminar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-danger border-0" title="Eliminar" onclick="return confirm('¿Borrar esta tarea completada?');">🗑️</a>
                 </div>
             {% else %}
                 <div class="list-group-item text-center text-muted py-4 bg-light">

@@ -71,6 +71,27 @@ def agregar_tarea():
         gestor.crear_tarea(session['usuario_id'], titulo, descripcion)
     return redirect(url_for('dashboard'))
 
+@app.route('/eliminar/<tarea_id>')
+def eliminar_tarea(tarea_id):
+    if 'usuario_id' in session:
+        gestor.eliminar_tarea(tarea_id)
+        flash('Tarea eliminada correctamente.')
+    return redirect(url_for('dashboard'))
+
+@app.route('/editar/<tarea_id>', methods=['GET', 'POST'])
+def editar_tarea(tarea_id):
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        descripcion = request.form['descripcion']
+        gestor.editar_tarea(tarea_id, titulo, descripcion)
+        flash('Tarea actualizada correctamente.')
+        return redirect(url_for('dashboard'))
+
+    tarea_actual = gestor.obtener_tarea(tarea_id)
+    return render_template('editar.html', tarea=tarea_actual)
+
 @app.route('/completar/<tarea_id>')
 def completar_tarea(tarea_id):
     if 'usuario_id' in session:

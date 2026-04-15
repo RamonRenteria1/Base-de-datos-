@@ -8,25 +8,38 @@
 </head>
 <body class="bg-light">
 
+{% if 'usuario_id' in session %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary bg-gradient shadow-sm mb-4 py-3">
   <div class="container">
     <a class="navbar-brand fw-bold fs-4" href="{{ url_for('dashboard') }}">
-        Gestor de Tareas 
+        📝 Gestor de Tareas 
     </a>
     <div class="d-flex align-items-center">
-        {% if 'usuario_id' in session %}
-            <span class="navbar-text text-white me-3">
-                Hola, <strong class="text-warning">{{ session['nombre'] }}</strong>
-            </span>
-            <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm fw-bold text-primary rounded-pill px-3">Cerrar Sesión</a>
-        {% else %}
-            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-sm me-2 rounded-pill px-3">Entrar</a>
-            <a href="{{ url_for('registro') }}" class="btn btn-warning btn-sm fw-bold text-dark rounded-pill px-3">Registrarse</a>
-        {% endif %}
+        <span class="navbar-text text-white me-3">
+            Hola, <strong class="text-warning">{{ session['nombre'] }}</strong>
+        </span>
+        <a href="{{ url_for('logout') }}" class="btn btn-light btn-sm fw-bold text-primary rounded-pill px-3 shadow-sm">
+            Cerrar Sesión
+        </a>
     </div>
   </div>
 </nav>
+{% endif %}
 
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-info border-0 shadow-sm rounded-3 alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
 <div class="container">
     {% with messages = get_flashed_messages() %}
         {% if messages %}

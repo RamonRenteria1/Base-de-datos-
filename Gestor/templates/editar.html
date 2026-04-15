@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 rounded-3 mt-4">
+            <div class="card-body p-4">
+                <h4 class="card-title mb-4">✏️ Editar Tarea</h4>
+                
+                <form method="POST" action="{{ url_for('editar_tarea', tarea_id=tarea._id) }}">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Título</label>
+                        <input type="text" name="titulo" class="form-control" value="{{ tarea.titulo }}" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted small">Descripción</label>
+                        <textarea name="descripcion" class="form-control" rows="3" required>{{ tarea.descripcion }}</textarea>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-light w-50 fw-bold rounded-pill">Cancelar</a>
+                        <button type="submit" class="btn btn-primary w-50 rounded-pill fw-bold">Guardar Cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -47,7 +47,9 @@ class GestorTareas:
     def obtener_usuario(self, email, password):
         usuario = self.db.usuarios.find_one({
             "email": email, 
+            
             "password": password
+            
         })
 
         if usuario:
@@ -56,54 +58,46 @@ class GestorTareas:
             
         return None
 
-
-
-    
     def crear_tarea(self, usuario_id, titulo, descripcion):
-        
-        
         nueva_tarea = {
-            "usuario_id": usuario_id,
+            "usuario_id": ObjectId(usuario_id), 
             "titulo": titulo,
             "descripcion": descripcion,
-            "estado": "pendiente"
+            "estado": "pendiente",
+            "fecha_creacion": datetime.now() 
         }
         
         resultado = self.db.tareas.insert_one(nueva_tarea)
-        return str(resultado.inserted_id) 
+        return str(resultado.inserted_id)
+    def obtener_tareas_usuario(self, usuario_id):
+        tareas = self.db.tareas.find({"usuario_id": ObjectId(usuario_id)})
+        return list(tareas)
     
-    def obtener_tareas_usuario(self, usuario_id: str, estado: Optional[str] = None) -> List[Dict]:
-        """Obtener tareas de un usuario, opcionalmente filtradas por estado"""
-        filtro = {"usuario_id": ObjectId(usuario_id)}
-        if estado:
-            filtro["estado"] = estado
-        
-        tareas = self.tareas.find(filtro).sort("fecha_creacion", -1)
-        resultado = []
-        for t in tareas:
-            t['_id'] = str(t['_id'])
-            t['usuario_id'] = str(t['usuario_id'])
-            resultado.append(t)
-        return resultado
-    
-    def actualizar_estado_tarea(self, tarea_id: str, nuevo_estado: str) -> bool:
-        """Actualizar el estado de una tarea"""
-        estados_validos = ["pendiente", "en_progreso", "completada", "cancelada"]
-        if nuevo_estado not in estados_validos:
-            print(f"❌ Error: Estado '{nuevo_estado}' no válido")
-            return False
-        
-        resultado = self.tareas.update_one(
+    def obtener_tarea(self, tarea_id):
+        tarea = self.db.tareas.find_one({"_id": ObjectId(tarea_id)})
+        if tarea:
+            tarea['_id'] = str(tarea['_id']) 
+            tarea['usuario_id'] = str(tarea['usuario_id'])
+        return tarea
+
+    def editar_tarea(self, tarea_id, titulo, descripcion):
+        resultado = self.db.tareas.update_one(
             {"_id": ObjectId(tarea_id)},
-            {
-                "$set": {
-                    "estado": nuevo_estado,
-                    "completada": nuevo_estado == "completada",
-                    "fecha_actualizacion": datetime.now()
-                }
-            }
+            {"$set": {
+                "titulo": titulo,
+                "descripcion": descripcion
+            }}
         )
         return resultado.modified_count > 0
+
+    def actualizar_estado_tarea(self, tarea_id, nuevo_estado):
+        
+        resultado = self.db.tareas.update_one(
+            {"_id": ObjectId(tarea_id)},
+            {"$set": {"estado": nuevo_estado}}
+        )
+        return resultado.modified_count > 0
+        
     
     def agregar_etiqueta(self, tarea_id: str, etiqueta: str) -> bool:
         """Agregar etiqueta a una tarea"""
@@ -113,9 +107,9 @@ class GestorTareas:
         )
         return resultado.modified_count > 0
     
-    def eliminar_tarea(self, tarea_id: str) -> bool:
-        """Eliminar una tarea"""
-        resultado = self.tareas.delete_one({"_id": ObjectId(tarea_id)})
+    def eliminar_tarea(self, tarea_id):
+        
+        resultado = self.db.tareas.delete_one({"_id": ObjectId(tarea_id)})
         return resultado.deleted_count > 0
     
     def estadisticas_usuario(self, usuario_id: str) -> Dict:

@@ -11,14 +11,17 @@ def registro():
         nombre = request.form['nombre']
         email = request.form['email']
         password = request.form['password']
-        
+        confirmar = request.form['confirmar_password']
+        if password != confirmar:
+            flash('❌ Las contraseñas no coinciden.', 'danger')
+            return render_template('registro.html') 
         usuario_id = gestor.crear_usuario(nombre, email, password)
         
         if usuario_id:
-            flash('¡Registro exitoso! Ya puedes iniciar sesión.')
+            flash('✅ Registro exitoso. Inicia sesión.')
             return redirect(url_for('login'))
         else:
-            flash('Ese correo ya existe, intenta con otro.')
+            flash('❌ El correo ya está registrado.','danger')
             
     return render_template('registro.html')
 
@@ -36,7 +39,7 @@ def login():
             session['nombre'] = usuario['nombre']
             return redirect(url_for('dashboard'))
         else:
-            flash('Correo o contraseña incorrectos.')
+            flash('Correo o contraseña incorrectos.', 'danger')
             
     return render_template('login.html')
 

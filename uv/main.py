@@ -1,5 +1,5 @@
 def main():
-    print("Hello from seg!")
+    print("Hello from uv!")
 
 
 if __name__ == "__main__":

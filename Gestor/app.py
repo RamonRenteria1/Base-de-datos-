@@ -53,7 +53,6 @@ def recuperar_password():
     return render_template('recuperar.html')
 
 
-@app.route('/')
 @app.route('/dashboard')
 def dashboard():
     if 'usuario_id' not in session:
@@ -68,10 +67,15 @@ def dashboard():
 
 @app.route('/agregar_tarea', methods=['POST'])
 def agregar_tarea():
-    if 'usuario_id' in session:
-        titulo = request.form['titulo']
-        descripcion = request.form['descripcion']
-        gestor.crear_tarea(session['usuario_id'], titulo, descripcion)
+    if 'usuario_id' not in session:
+        return redirect(url_for('login'))
+        
+    titulo = request.form['titulo']
+    descripcion = request.form['descripcion']
+    fecha_entrega = request.form['fecha_entrega'] # <--- Aquí recibimos la fecha
+    
+    gestor.crear_tarea(session['usuario_id'], titulo, descripcion, fecha_entrega)
+    flash('Tarea creada correctamente', 'success')
     return redirect(url_for('dashboard'))
 
 @app.route('/eliminar/<tarea_id>')

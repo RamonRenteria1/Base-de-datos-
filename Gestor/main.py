@@ -58,13 +58,14 @@ class GestorTareas:
             
         return None
 
-    def crear_tarea(self, usuario_id, titulo, descripcion):
+    def crear_tarea(self, usuario_id, titulo, descripcion, fecha_entrega):
         nueva_tarea = {
-            "usuario_id": ObjectId(usuario_id), 
+            "usuario_id": ObjectId(usuario_id),
             "titulo": titulo,
             "descripcion": descripcion,
             "estado": "pendiente",
-            "fecha_creacion": datetime.now() 
+            "fecha_creacion": datetime.now(),
+            "fecha_entrega": fecha_entrega  # Guardamos la fecha límite
         }
         
         resultado = self.db.tareas.insert_one(nueva_tarea)
@@ -91,10 +92,13 @@ class GestorTareas:
         return resultado.modified_count > 0
 
     def actualizar_estado_tarea(self, tarea_id, nuevo_estado):
-        
+        actualizacion = {"estado": nuevo_estado}
+        if nuevo_estado == 'completada':
+            actualizacion["fecha_cierre"] = datetime.now()
+            
         resultado = self.db.tareas.update_one(
             {"_id": ObjectId(tarea_id)},
-            {"$set": {"estado": nuevo_estado}}
+            {"$set": actualizacion}
         )
         return resultado.modified_count > 0
         

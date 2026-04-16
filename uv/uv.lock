@@ -173,7 +173,7 @@ wheels = [
 ]
 
 [[package]]
-name = "seg"
+name = "uv"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

@@ -9,29 +9,37 @@
                 <h5 class="card-title text-primary">Nueva Tarea</h5>
                 <form method="POST" action="{{ url_for('agregar_tarea') }}">
                     <div class="mb-2">
-                        <input type="text" name="titulo" class="form-control" placeholder="¿Qué necesitas hacer?" required>
+                        <input type="text" name="titulo" class="form-control form-control-sm" placeholder="Título de la tarea" required>
+                    </div>
+                    <div class="mb-2">
+                        <textarea name="descripcion" class="form-control form-control-sm" rows="2" placeholder="Instrucciones o detalles"></textarea>
                     </div>
                     <div class="mb-3">
-                        <textarea name="descripcion" class="form-control" rows="2" placeholder="Detalles (opcional)"></textarea>
+                        <label class="form-label small text-muted mb-1">📅 Fecha límite de entrega:</label>
+                        <input type="date" name="fecha_entrega" class="form-control form-control-sm" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-sm px-4">Agregar</button>
+                    <button type="submit" class="btn btn-primary btn-sm px-4 shadow-sm">Asignar Tarea</button>
                 </form>
             </div>
         </div>
 
-        <h4 class="text-secondary mb-3"> Pendientes</h4>
+        <h4 class="text-secondary mb-3">Pendientes</h4>
         <div class="list-group shadow-sm">
             {% for tarea in pendientes %}
                 <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1">{{ tarea.titulo }}</h6>
+                        <h6 class="mb-1 fw-bold">{{ tarea.titulo }}</h6>
                         {% if tarea.descripcion %}
-                            <small class="text-muted">{{ tarea.descripcion }}</small>
+                            <p class="mb-1 small text-muted">{{ tarea.descripcion }}</p>
                         {% endif %}
+                        <div class="d-flex flex-column">
+                            <small class="text-muted"><strong>Inicio:</strong> {{ tarea.fecha_creacion.strftime('%d/%m/%Y') }}</small>
+                            <small class="text-danger"><strong>Entrega:</strong> {{ tarea.fecha_entrega }}</small>
+                        </div>
                     </div>
                     
                     <div class="btn-group shadow-sm">
-                        <a href="{{ url_for('completar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-success" title="Completar">✔</a>
+                        <a href="{{ url_for('completar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-success" title="Completar">👍</a>
                         <a href="{{ url_for('editar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-primary" title="Editar">✏️</a>
                         <a href="{{ url_for('eliminar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Estás seguro de borrar esta tarea?');">🗑️</a>
                     </div>
@@ -51,9 +59,9 @@
                 <div class="list-group-item list-group-item-action bg-light d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="mb-1 text-decoration-line-through text-success">{{ tarea.titulo }}</h6>
-                        {% if tarea.descripcion %}
-                            <small class="text-muted">{{ tarea.descripcion }}</small>
-                        {% endif %}
+                        <div class="d-flex flex-column">
+                            <small class="text-muted"><strong>Finalizada:</strong> {{ tarea.fecha_cierre.strftime if tarea.fecha_cierre else 'N/A' }}</small>
+                        </div>
                     </div>
                     
                     <a href="{{ url_for('eliminar_tarea', tarea_id=tarea._id) }}" class="btn btn-sm btn-outline-danger border-0" title="Eliminar" onclick="return confirm('¿Borrar esta tarea completada?');">🗑️</a>
